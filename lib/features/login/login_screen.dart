@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
+import 'package:task_manager_app/core/utils/notification_util.dart';
 import 'package:task_manager_app/features/login/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -53,10 +55,9 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             error: (message) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(message),
-                  ),
+                NotificationUtil.showNotification(
+                  message,
+                  NotificationType.error,
                 );
               });
             },
