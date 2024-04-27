@@ -6,16 +6,13 @@ import 'package:task_manager_app/core/data/data_source/local/user_data_source.da
 import 'package:task_manager_app/features/login/login_screen.dart';
 import 'package:task_manager_app/features/login/login_view_model.dart';
 import 'package:task_manager_app/features/login/repository/login_repository.dart';
+import 'package:task_manager_app/features/task/presentation/task_ui.dart';
+import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
+import 'package:task_manager_app/features/task/repository/task_repository.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LoginViewModel(
-        loginRepository: LoginRepository(),
-        userDataSource: UserDataSource(),
-      )..getCurrentUser(),
-      child: const MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -24,25 +21,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LoginViewModel>(
-      builder: (_, model, __) => OverlaySupport.global(
-          child: MaterialApp(
-            title: 'Task Manager',
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-              textTheme: GoogleFonts.robotoTextTheme(
-                Theme.of(context).textTheme,
-              ),
-            ),
-            home: model.user != null
-                ? Container(
-                    color: Colors.green,
-                  )
-                : const LoginScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => LoginViewModel(
+            loginRepository: LoginRepository(),
+            userDataSource: UserDataSource(),
+          )..getCurrentUser(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskViewModel(
+            taskRepository: TaskRepository(),
           ),
         ),
+      ],
+      child: MaterialApp(
+        title: 'Task Manager',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          textTheme: GoogleFonts.robotoTextTheme(
+            Theme.of(context).textTheme,
+          ),
+        ),
+        home: Consumer<LoginViewModel>(
+          builder: (_, model, __) {
+            if (model.user != null) {
+              return const TaskUi();
+            }
+
+            return const LoginScreen();
+          },
+        ),
+      ),
     );
   }
 }
