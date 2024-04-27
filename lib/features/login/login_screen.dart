@@ -36,134 +36,137 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Task Manager',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Task Manager',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-      ),
-      body: Consumer<LoginViewModel>(
-        builder: (_, model, __) {
-          final isLoading = model.loginState == const RequestState.loading();
+        body: Consumer<LoginViewModel>(
+          builder: (_, model, __) {
+            final isLoading = model.loginState == const RequestState.loading();
 
-          model.loginState.maybeWhen(
-            success: () {
-              // Navigate to dashboard
-            },
-            error: (message) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                NotificationUtil.showNotification(
-                  message,
-                  NotificationType.error,
-                );
-              });
-            },
-            orElse: () {},
-          );
+            model.loginState.maybeWhen(
+              success: () {
+                // Navigate to dashboard
+              },
+              error: (message) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  NotificationUtil.showNotification(
+                    message,
+                    NotificationType.error,
+                  );
+                });
+              },
+              orElse: () {},
+            );
 
-          return Center(
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AbsorbPointer(
-                        absorbing: isLoading,
-                        child: TextFormField(
-                          controller: _usernameTextController,
-                          decoration: InputDecoration(
-                            hintText: "Username",
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          validator: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return 'username is required';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      AbsorbPointer(
-                        absorbing: isLoading,
-                        child: TextFormField(
-                          controller: _passwordTextController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: "Password",
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          validator: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 32,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            model.handleLogin(
-                              username: _usernameTextController.text.trim(),
-                              password: _passwordTextController.text.trim(),
-                            );
-                          }
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                            const Color(0xff2C64C6),
-                          ),
-                          minimumSize: MaterialStateProperty.all(
-                            const Size.fromHeight(56),
-                          ),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                        ),
-                        child: isLoading
-                            ? const CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                "Log In",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                ),
+            return Center(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: TextFormField(
+                            controller: _usernameTextController,
+                            decoration: InputDecoration(
+                              hintText: "Username",
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
                               ),
-                      ),
-                    ],
+                            ),
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return 'username is required';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: TextFormField(
+                            controller: _passwordTextController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              hintText: "Password",
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password is required';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              model.handleLogin(
+                                username: _usernameTextController.text.trim(),
+                                password: _passwordTextController.text.trim(),
+                              );
+                            }
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              const Color(0xff2C64C6),
+                            ),
+                            minimumSize: MaterialStateProperty.all(
+                              const Size.fromHeight(56),
+                            ),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Log In",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
