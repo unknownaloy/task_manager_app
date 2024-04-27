@@ -1,9 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager_app/features/login/login_screen.dart';
+import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/login/repository/login_repository.dart';
 
 void main() {
-  runApp(const MyApp());
+  // runApp(
+  //   ChangeNotifierProvider(
+  //     create: (_) => LoginViewModel(
+  //       loginRepository: locator<LoginRepository>(),
+  //       storageService: locator<StorageService>(),
+  //     )..getEdenUser(),
+  //     child: const MyApp(),
+  //   ),
+  // );
+
+  // runApp(const MyApp());
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LoginViewModel(
+        loginRepository: LoginRepository(),
+      ),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,17 +34,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Task Manager',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        textTheme: GoogleFonts.robotoTextTheme(
-          Theme.of(context).textTheme,
+    return Consumer<LoginViewModel>(
+      builder: (_, model, __) => OverlaySupport.global(
+        child: MaterialApp(
+          title: 'Task Manager',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+            textTheme: GoogleFonts.robotoTextTheme(
+              Theme.of(context).textTheme,
+            ),
+          ),
+          home: const LoginScreen(),
         ),
       ),
-      home: const LoginScreen(),
     );
   }
 }

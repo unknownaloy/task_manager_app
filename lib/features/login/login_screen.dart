@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/core/data/unions/request_state.dart';
+import 'package:task_manager_app/features/login/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,95 +43,126 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: _usernameTextController,
-                    decoration: InputDecoration(
-                      hintText: "Username",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'username is required';
-                      }
-                      return null;
-                    },
+      body: Consumer<LoginViewModel>(
+        builder: (_, model, __) {
+          final isLoading = model.loginState == const RequestState.loading();
+
+          model.loginState.maybeWhen(
+            success: () {
+              // Navigate to dashboard
+            },
+            error: (message) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
                   ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  TextFormField(
-                    controller: _passwordTextController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: "Password",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 32,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // final model = ref.read(loginViewModel.notifier);
-                        //
-                        // model.login(
-                        //   email: _emailTextController.text.trim(),
-                        //   password: _passwordTextController.text.trim(),
-                        // );
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        const Color(0xff2C64C6),
-                      ),
-                      minimumSize: MaterialStateProperty.all(
-                        const Size.fromHeight(56),
-                      ),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+                );
+              });
+            },
+            orElse: () {},
+          );
+
+          return Center(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AbsorbPointer(
+                        absorbing: isLoading,
+                        child: TextFormField(
+                          controller: _usernameTextController,
+                          decoration: InputDecoration(
+                            hintText: "Username",
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'username is required';
+                            }
+                            return null;
+                          },
                         ),
                       ),
-                    ),
-                    child: const Text(
-                      "Log In",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                      const SizedBox(
+                        height: 24,
                       ),
-                    ),
+                      AbsorbPointer(
+                        absorbing: isLoading,
+                        child: TextFormField(
+                          controller: _passwordTextController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: "Password",
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            model.handleLogin(
+                              username: _usernameTextController.text.trim(),
+                              password: _passwordTextController.text.trim(),
+                            );
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            const Color(0xff2C64C6),
+                          ),
+                          minimumSize: MaterialStateProperty.all(
+                            const Size.fromHeight(56),
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "Log In",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

@@ -1,4 +1,5 @@
-import 'package:http/http.dart' as http;
+import 'package:http_interceptor/http_interceptor.dart';
+import 'package:task_manager_app/core/interceptors/api_interceptor.dart';
 
 class NetworkUtil {
   factory NetworkUtil() => _instance;
@@ -7,7 +8,11 @@ class NetworkUtil {
 
   static final NetworkUtil _instance = NetworkUtil._();
 
-  final http.Client _client = http.Client();
+  final _client = InterceptedHttp.build(
+    interceptors: [
+      ApiInterceptor(),
+    ],
+  );
 
-  http.Client get client => _client;
+  InterceptedHttp get client => _client;
 }
