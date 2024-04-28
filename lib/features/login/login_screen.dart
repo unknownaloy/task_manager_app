@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
-import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/login/authentication_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        body: Consumer<LoginViewModel>(
+        body: Consumer<AuthenticationViewModel>(
           builder: (_, model, __) {
             final isLoading = model.loginState == const RequestState.loading();
 

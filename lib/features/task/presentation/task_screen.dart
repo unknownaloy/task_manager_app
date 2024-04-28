@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
-import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/login/authentication_view_model.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
 import 'package:task_manager_app/features/task/presentation/widgets/task_card.dart';
 import 'package:task_manager_app/features/task/presentation/widgets/task_dialog.dart';
@@ -104,8 +104,8 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginViewModel = context.read<LoginViewModel>();
-    final user = loginViewModel.user!;
+    final authViewModel = context.read<AuthenticationViewModel>();
+    final user = authViewModel.user!;
 
     return Consumer<TaskViewModel>(
       builder: (_, model, __) {
@@ -163,7 +163,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     width: 16,
                   ),
                   IconButton(
-                    onPressed: loginViewModel.handleSignOut,
+                    onPressed: authViewModel.handleSignOut,
                     icon: const Icon(
                       Icons.logout,
                       size: 40,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
-import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/login/authentication_view_model.dart';
 import 'package:task_manager_app/features/task/data/dto/add_task.dto.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
 
@@ -35,7 +35,7 @@ class _TaskDialogState extends State<TaskDialog> {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<TaskViewModel>();
-    final user = context.read<LoginViewModel>().user!;
+    final user = context.read<AuthenticationViewModel>().user!;
 
     if (model.addRequestState == const RequestState.success()) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

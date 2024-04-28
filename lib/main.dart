@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/data/data_source/local/user_data_source.dart';
 import 'package:task_manager_app/features/login/login_screen.dart';
-import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/login/authentication_view_model.dart';
 import 'package:task_manager_app/features/login/repository/login_repository.dart';
 import 'package:task_manager_app/features/task/presentation/task_screen.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => LoginViewModel(
+          create: (_) => AuthenticationViewModel(
             loginRepository: LoginRepository(),
             userDataSource: UserDataSource(),
             taskDatabase: TaskDatabase(),
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
               Theme.of(context).textTheme,
             ),
           ),
-          home: Consumer<LoginViewModel>(
+          home: Consumer<AuthenticationViewModel>(
             builder: (_, model, __) {
               if (model.user != null) {
                 return const TaskScreen();

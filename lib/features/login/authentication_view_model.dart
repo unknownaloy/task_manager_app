@@ -9,8 +9,8 @@ import 'package:task_manager_app/core/utils/failure.dart';
 import 'package:task_manager_app/features/login/data/login_dto.dart';
 import 'package:task_manager_app/features/login/repository/login_repository.dart';
 
-class LoginViewModel extends ChangeNotifier {
-  LoginViewModel({
+class AuthenticationViewModel extends ChangeNotifier {
+  AuthenticationViewModel({
     required LoginRepository loginRepository,
     required UserDataSource userDataSource,
     required TaskDatabase taskDatabase,
