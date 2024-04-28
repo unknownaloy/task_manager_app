@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
 import 'package:task_manager_app/core/utils/failure.dart';
@@ -10,9 +14,13 @@ import 'package:task_manager_app/features/task/repository/task_repository.dart';
 class TaskViewModel extends ChangeNotifier {
   TaskViewModel({
     required TaskRepository taskRepository,
-  }) : _taskRepository = taskRepository;
+    required TaskDatabase taskDatabase,
+  })  : _taskRepository = taskRepository,
+        _taskDatabase = taskDatabase;
 
   final TaskRepository _taskRepository;
+  final TaskDatabase _taskDatabase;
+
 
   var _tasks = <Task>[];
   List<Task> get tasks => [..._tasks];
@@ -34,6 +42,10 @@ class TaskViewModel extends ChangeNotifier {
       _tasks = await _taskRepository.getUserTasks(_taskDto);
 
       _requestState = const RequestState.success();
+
+      if (_tasks.isNotEmpty) {
+        await _taskDatabase.cacheTasks(tasks);
+      }
     } on Failure catch (err) {
       // Handle error
       _requestState = RequestState.error(message: err.message);
@@ -41,6 +53,25 @@ class TaskViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  Future<void> loadFromCache() async {
+    _requestState = const RequestState.loading();
+
+    try {
+      _tasks = await _taskDatabase.getAllTasks();
+
+      _requestState = const RequestState.success();
+
+    } on Failure catch (err) {
+      // Handle error
+      _requestState = RequestState.error(message: err.message);
+    } finally {
+      notifyListeners();
+    }
+  }
+
+
 
   Future<void> fetchMoreTasks() async {
     try {
@@ -75,4 +106,6 @@ class TaskViewModel extends ChangeNotifier {
       );
     }
   }
+
+
 }

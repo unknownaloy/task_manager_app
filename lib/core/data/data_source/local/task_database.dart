@@ -14,12 +14,12 @@ class TaskDatabase {
 
   Future<void> createTable(Database database) async {
     final createdDB = await database.execute("""
-      CREATE TABLE IF NOT EXISTS $_tableName(
+    CREATE TABLE IF NOT EXISTS $_tableName(
       "id" INTEGER PRIMARY KEY,
       "todo" TEXT NOT NULL,
       "completed" INTEGER NOT NULL
-      ");
-      """);
+    )
+  """);
 
     return createdDB;
   }
@@ -33,7 +33,7 @@ class TaskDatabase {
     for (final task in tasks) {
       await db.insert(
         _tableName,
-        task.toJson(),
+        task.toJsonSqfliteDatabase(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
@@ -43,7 +43,7 @@ class TaskDatabase {
     final db = await DatabaseService().database;
     final id = await db.insert(
       _tableName,
-      task.toJson(),
+      task.toJsonSqfliteDatabase(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     return id;
@@ -53,7 +53,7 @@ class TaskDatabase {
     final db = await DatabaseService().database;
     final id = await db.update(
       _tableName,
-      task.toJson(),
+      task.toJsonSqfliteDatabase(),
       where: 'id = ?',
       whereArgs: [task.id],
       conflictAlgorithm: ConflictAlgorithm.rollback,
@@ -82,7 +82,7 @@ class TaskDatabase {
 
     return List.generate(
       maps.length,
-      (index) => Task.fromJson(
+      (index) => Task.fromSqfliteDatabase(
         maps[index],
       ),
     );

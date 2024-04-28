@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/network_manager/network_util.dart';
 import 'package:task_manager_app/core/utils/failure.dart';
 import 'package:task_manager_app/core/utils/typedefs.dart';
@@ -46,7 +46,13 @@ class TaskRepository {
 
       return tasks;
     } on SocketException catch (_) {
-      throw Failure("No internet connection");
+      try {
+        final tasks = await TaskDatabase().getAllTasks();
+
+        return Future.value(tasks);
+      } catch (_) {
+        throw Failure("No internet connection");
+      }
     } on HttpException {
       throw Failure("Service not currently available");
     } on TimeoutException catch (_) {

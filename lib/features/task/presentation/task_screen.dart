@@ -1,5 +1,11 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_manager_app/core/data/enums/notification_type.dart';
+import 'package:task_manager_app/core/utils/notification_util.dart';
 import 'package:task_manager_app/features/login/login_view_model.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
 import 'package:task_manager_app/features/task/presentation/widgets/task_card.dart';
@@ -14,9 +20,14 @@ class TaskScreen extends StatefulWidget {
 
 class _TaskScreenState extends State<TaskScreen> {
   late final ScrollController _scrollController;
+  late StreamSubscription<List<ConnectivityResult>> _subscription;
 
   bool _isAtBottom = false;
   bool _isLoadingMoreData = false;
+
+  bool _hasInternetConnection = true;
+  bool _isLoadedFromCache = false;
+
 
   void _scrollListenerHandler() {
     final maxScroll = _scrollController.position.maxScrollExtent;
@@ -24,7 +35,9 @@ class _TaskScreenState extends State<TaskScreen> {
     final delta = MediaQuery.of(context).size.height * 0.20;
 
     if (maxScroll - currentScroll <= delta) {
-      context.read<TaskViewModel>().fetchMoreTasks();
+      if (_hasInternetConnection) {
+        context.read<TaskViewModel>().fetchMoreTasks();
+      }
     }
 
     if (_scrollController.offset >=
@@ -36,11 +49,40 @@ class _TaskScreenState extends State<TaskScreen> {
     }
   }
 
+
   @override
   void initState() {
     super.initState();
 
-    context.read<TaskViewModel>().fetchInitialTasks();
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      final taskViewModel = context.read<TaskViewModel>();
+      final hasConnection = result.contains(ConnectivityResult.mobile) ||
+          result.contains(ConnectivityResult.wifi);
+
+      setState(() => _hasInternetConnection = hasConnection);
+
+      debugPrint("_hasInternetConnection - $_hasInternetConnection");
+
+      if (hasConnection) {
+        if (_isLoadedFromCache || taskViewModel.tasks.isEmpty) {
+          taskViewModel.fetchInitialTasks();
+        }
+      } else {
+        if (taskViewModel.tasks.isEmpty) {
+          taskViewModel.loadFromCache();
+
+          NotificationUtil.showNotification(
+            "Loaded from cache",
+            NotificationType.caution,
+          );
+          setState(() {
+            _isLoadedFromCache = true;
+          });
+        }
+      }
+    });
 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListenerHandler);
@@ -49,6 +91,7 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _subscription.cancel();
 
     super.dispose();
   }
@@ -56,6 +99,7 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.read<LoginViewModel>().user!;
+
     return Consumer<TaskViewModel>(
       builder: (_, model, __) {
         return model.requestState.maybeWhen(
@@ -100,7 +144,12 @@ class _TaskScreenState extends State<TaskScreen> {
                       borderRadius: const BorderRadius.all(
                         Radius.circular(23),
                       ),
-                      child: Image.network(user.image),
+                      child: CachedNetworkImage(
+                        imageUrl: user.image,
+                        placeholder: (context, url) => Container(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      ),
                     ),
                   ),
                   const SizedBox(
