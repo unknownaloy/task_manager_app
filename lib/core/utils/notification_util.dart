@@ -9,8 +9,10 @@ class NotificationUtil {
 
   static final NotificationUtil _instance = NotificationUtil._();
 
-  static void showNotification(String message,
-      [NotificationType type = NotificationType.success]) {
+  void showNotification(
+    String message, [
+    NotificationType type = NotificationType.success,
+  ]) {
     showSimpleNotification(
       Text(message),
       background: type.color,

@@ -63,7 +63,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
       if (hasConnection) {
         if (_isLoadedFromCache) {
-          NotificationUtil.showNotification(
+          NotificationUtil().showNotification(
             "Tasks updated",
           );
         }
@@ -74,7 +74,7 @@ class _TaskScreenState extends State<TaskScreen> {
         if (taskViewModel.tasks.isEmpty) {
           taskViewModel.loadFromCache();
 
-          NotificationUtil.showNotification(
+          NotificationUtil().showNotification(
             "Loaded from cache",
             NotificationType.caution,
           );
@@ -82,7 +82,7 @@ class _TaskScreenState extends State<TaskScreen> {
             _isLoadedFromCache = true;
           });
         } else {
-          NotificationUtil.showNotification(
+          NotificationUtil().showNotification(
             "Internet connection lost",
             NotificationType.caution,
           );

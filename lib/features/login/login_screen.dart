@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               error: (message) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  NotificationUtil.showNotification(
+                  NotificationUtil().showNotification(
                     message,
                     NotificationType.error,
                   );

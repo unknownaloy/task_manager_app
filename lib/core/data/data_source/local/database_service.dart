@@ -36,6 +36,3 @@ class DatabaseService {
     await TaskDatabase().createTable(db);
   }
 }
-
-
-

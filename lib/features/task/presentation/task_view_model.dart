@@ -103,7 +103,7 @@ class TaskViewModel extends ChangeNotifier {
       }
     } on Failure catch (err) {
       _taskDto = _taskDto.copyWith(skip: _taskDto.skip - 10);
-      NotificationUtil.showNotification(
+      NotificationUtil().showNotification(
         err.message,
         NotificationType.error,
       );
@@ -129,7 +129,7 @@ class TaskViewModel extends ChangeNotifier {
       );
     } on Failure catch (err) {
       _addRequestState = RequestState.error(message: err.message);
-      NotificationUtil.showNotification(
+      NotificationUtil().showNotification(
         err.message,
         NotificationType.error,
       );
@@ -162,7 +162,7 @@ class TaskViewModel extends ChangeNotifier {
       unawaited(
         _taskDatabase.updateTask(taskToUpdate),
       );
-      NotificationUtil.showNotification(
+      NotificationUtil().showNotification(
         err.message,
         NotificationType.error,
       );
@@ -179,7 +179,7 @@ class TaskViewModel extends ChangeNotifier {
 
       await _taskRepository.deleteTask();
 
-      NotificationUtil.showNotification(
+      NotificationUtil().showNotification(
         "Success",
       );
 
@@ -192,7 +192,7 @@ class TaskViewModel extends ChangeNotifier {
       unawaited(
         _taskDatabase.cacheTasks(_tasks),
       );
-      NotificationUtil.showNotification(
+      NotificationUtil().showNotification(
         err.message,
         NotificationType.error,
       );
