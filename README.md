@@ -1,5 +1,7 @@
 # Task Manager Assessment
 
+This is a user-friendly task manager app with data caching
+
 ## Download for Android
 
 - [👉🏼 Download and Install the App](https://github.com/unknownaloy/task_manager_app/raw/main/apk/moniepoint_ellis.apk)
@@ -22,3 +24,22 @@
 
 - username: `kminchelle`
 - password: `0lelplR`
+
+## Running Tests
+
+- Open the project in your preferred code editor.
+- Run `flutter test` to run all tests in the project
+
+## How it Works
+
+- To access the Task Manager app, you will need to provide login credentials. Kindly refer to **Login Details**.
+- User can also go here [Get login credentials](https://dummyjson.com/users) to log in with other details
+- After authentication, the user is directed to the dashboard where the can see tasks the have.
+- The user can logout of the app using the **sign out** icon located at the top-right of the app bar.
+
+## Features
+
+- Form validation
+- Pull-to-refresh
+- Caching of user and users' tasks
+- Updating, adding, and deleting tasks (CRUD)
