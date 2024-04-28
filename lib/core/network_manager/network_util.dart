@@ -6,6 +6,7 @@ class NetworkUtil {
 
   NetworkUtil._();
 
+
   static final NetworkUtil _instance = NetworkUtil._();
 
   final _client = InterceptedHttp.build(

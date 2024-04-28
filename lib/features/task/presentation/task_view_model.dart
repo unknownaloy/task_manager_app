@@ -18,16 +18,14 @@ class TaskViewModel extends ChangeNotifier {
   RequestState _requestState = const RequestState.idle();
   RequestState get requestState => _requestState;
 
-  Future<void> fetchTasks (int currentIndex) async {
+  Future<void> fetchTasks(int currentIndex) async {
     _requestState = const RequestState.loading();
-    // notifyListeners();
 
     try {
       final params = TaskDto(skip: currentIndex);
       _tasks = await _taskRepository.getUserTasks(params);
 
       _requestState = const RequestState.success();
-
     } on Failure catch (err) {
       // Handle error
       _requestState = RequestState.error(message: err.message);

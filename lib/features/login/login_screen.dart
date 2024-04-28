@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
-                                return 'username is required';
+                                return 'Username is required';
                               }
                               return null;
                             },

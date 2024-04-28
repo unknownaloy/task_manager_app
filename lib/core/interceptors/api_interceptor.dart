@@ -31,11 +31,11 @@ class ApiInterceptor implements InterceptorContract {
   }) async {
 
     debugPrint("ApiInterceptor ------------START----------->");
-    debugPrint("ApiInterceptor - METHOD -- ${response.request?.method.toUpperCase()}");
-    debugPrint("ApiInterceptor - URL -- ${response.request?.url}");
-    debugPrint("ApiInterceptor - STATUS_CODE -- ${response.statusCode}");
+    debugPrint("\nApiInterceptor - METHOD -- ${response.request?.method.toUpperCase()}");
+    debugPrint("\nApiInterceptor - URL -- ${response.request?.url}");
+    debugPrint("\nApiInterceptor - STATUS_CODE -- ${response.statusCode}");
     if (response is Response) {
-      debugPrint("ApiInterceptor - RESPONSE -- ${response.body}");
+      debugPrint("\nApiInterceptor - RESPONSE -- ${response.body}");
 
     }
     debugPrint("ApiInterceptor ------------END----------->");

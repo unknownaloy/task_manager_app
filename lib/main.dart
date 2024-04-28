@@ -6,7 +6,7 @@ import 'package:task_manager_app/core/data/data_source/local/user_data_source.da
 import 'package:task_manager_app/features/login/login_screen.dart';
 import 'package:task_manager_app/features/login/login_view_model.dart';
 import 'package:task_manager_app/features/login/repository/login_repository.dart';
-import 'package:task_manager_app/features/task/presentation/task_ui.dart';
+import 'package:task_manager_app/features/task/presentation/task_screen.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
 import 'package:task_manager_app/features/task/repository/task_repository.dart';
 
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
         home: Consumer<LoginViewModel>(
           builder: (_, model, __) {
             if (model.user != null) {
-              return const TaskUi();
+              return const TaskScreen();
             }
 
             return const LoginScreen();
