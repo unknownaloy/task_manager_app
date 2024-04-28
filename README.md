@@ -32,10 +32,10 @@ This is a user-friendly task manager app with data caching
 
 ## How it Works
 
-- To access the Task Manager app, you will need to provide login credentials. Kindly refer to **Login Details**.
+- To access the Task Manager app, you will need to provide login credentials. Kindly refer to `Login Details`.
 - User can also go here [Get login credentials](https://dummyjson.com/users) to log in with other details
 - After authentication, the user is directed to the dashboard where the can see tasks the have.
-- The user can logout of the app using the **sign out** icon located at the top-right of the app bar.
+- The user can logout of the app using the `sign out` icon located at the top-right of the app bar.
 
 ## Features
 
