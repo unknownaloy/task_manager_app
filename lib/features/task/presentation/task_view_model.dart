@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
@@ -36,9 +36,6 @@ class TaskViewModel extends ChangeNotifier {
 
   RequestState _addRequestState = const RequestState.idle();
   RequestState get addRequestState => _addRequestState;
-
-  RequestState _editRequestState = const RequestState.idle();
-  RequestState get editRequestState => _editRequestState;
 
   Future<void> fetchInitialTasks() async {
     _requestState = const RequestState.loading();
@@ -157,13 +154,13 @@ class TaskViewModel extends ChangeNotifier {
       await _taskRepository.updateTask(params);
 
       unawaited(
-        _taskDatabase.cacheTasks(_tasks),
+        _taskDatabase.updateTask(updatedTask),
       );
     } on Failure catch (err) {
       // Reverse optimistic update
       _tasks = cachedTasks;
       unawaited(
-        _taskDatabase.cacheTasks(_tasks),
+        _taskDatabase.updateTask(taskToUpdate),
       );
       NotificationUtil.showNotification(
         err.message,
@@ -187,7 +184,7 @@ class TaskViewModel extends ChangeNotifier {
       );
 
       unawaited(
-        _taskDatabase.cacheTasks(_tasks),
+        _taskDatabase.deleteTask(taskToDelete),
       );
     } on Failure catch (err) {
       // Reverse optimistic update

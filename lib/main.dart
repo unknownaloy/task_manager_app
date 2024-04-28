@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
           create: (_) => LoginViewModel(
             loginRepository: LoginRepository(),
             userDataSource: UserDataSource(),
+            taskDatabase: TaskDatabase(),
           )..getCurrentUser(),
         ),
         ChangeNotifierProvider(

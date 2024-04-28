@@ -39,6 +39,12 @@ class TaskDatabase {
     }
   }
 
+  Future<void> clearDatabase() async {
+    final db = await DatabaseService().database;
+
+    await db.delete(_tableName);
+  }
+
   Future<int> addTask(Task task) async {
     final db = await DatabaseService().database;
     final id = await db.insert(

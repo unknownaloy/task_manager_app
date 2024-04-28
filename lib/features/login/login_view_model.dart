@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/data/data_source/local/user_data_source.dart';
 import 'package:task_manager_app/core/data/models/user/user.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
@@ -10,11 +13,14 @@ class LoginViewModel extends ChangeNotifier {
   LoginViewModel({
     required LoginRepository loginRepository,
     required UserDataSource userDataSource,
+    required TaskDatabase taskDatabase,
   })  : _loginRepository = loginRepository,
-        _userDataSource = userDataSource;
+        _userDataSource = userDataSource,
+        _taskDatabase = taskDatabase;
 
   final LoginRepository _loginRepository;
   final UserDataSource _userDataSource;
+  final TaskDatabase _taskDatabase;
 
   User? _user;
   User? get user => _user;
@@ -52,6 +58,17 @@ class LoginViewModel extends ChangeNotifier {
       _loginState = RequestState.error(message: err.message);
     } finally {
       notifyListeners();
+    }
+  }
+
+  Future<void> handleSignOut() async {
+    try {
+      _user = null;
+      notifyListeners();
+
+      unawaited(_taskDatabase.clearDatabase());
+    } catch (err) {
+      // Handle error
     }
   }
 }
