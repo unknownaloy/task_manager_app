@@ -202,17 +202,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                 children: [
                                   TaskCard(
                                     task: task,
-                                    onEdit: () {
-                                      // showDialog<void>(
-                                      //   context: context,
-                                      //   builder: (context) => Dialog(
-                                      //     child: TaskDialog(
-                                      //       task: task,
-                                      //     ),
-                                      //   ),
-                                      // );
-                                    },
-                                    onDelete: () {},
+                                    onEdit: () => model.editTask(task),
+                                    onDelete: () =>
+                                        model.deleteTaskHandler(task),
                                   ),
                                   const SizedBox(
                                     height: 10,

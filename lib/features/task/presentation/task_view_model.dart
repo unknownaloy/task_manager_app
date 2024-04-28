@@ -8,6 +8,7 @@ import 'package:task_manager_app/core/utils/failure.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
 import 'package:task_manager_app/features/task/data/dto/add_task.dto.dart';
 import 'package:task_manager_app/features/task/data/dto/task_dto.dart';
+import 'package:task_manager_app/features/task/data/dto/update_task_dto.dart';
 import 'package:task_manager_app/features/task/data/model/task/task.dart';
 import 'package:task_manager_app/features/task/repository/task_repository.dart';
 
@@ -131,6 +132,69 @@ class TaskViewModel extends ChangeNotifier {
       );
     } on Failure catch (err) {
       _addRequestState = RequestState.error(message: err.message);
+      NotificationUtil.showNotification(
+        err.message,
+        NotificationType.error,
+      );
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> editTask(Task taskToUpdate) async {
+    final cachedTasks = [..._tasks];
+    try {
+      final completed = !taskToUpdate.completed;
+
+      final updatedTask = taskToUpdate.copyWith(completed: completed);
+
+      _tasks[_tasks.indexWhere((element) => element.id == taskToUpdate.id)] =
+          updatedTask;
+
+      notifyListeners();
+
+      final params = UpdateTaskDto(completed: completed);
+      await _taskRepository.updateTask(params);
+
+      unawaited(
+        _taskDatabase.cacheTasks(_tasks),
+      );
+    } on Failure catch (err) {
+      // Reverse optimistic update
+      _tasks = cachedTasks;
+      unawaited(
+        _taskDatabase.cacheTasks(_tasks),
+      );
+      NotificationUtil.showNotification(
+        err.message,
+        NotificationType.error,
+      );
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteTaskHandler(Task taskToDelete) async {
+    final cachedTasks = [..._tasks];
+    try {
+      _tasks.remove(taskToDelete);
+      notifyListeners();
+
+      await _taskRepository.deleteTask();
+
+      NotificationUtil.showNotification(
+        "Success",
+      );
+
+      unawaited(
+        _taskDatabase.cacheTasks(_tasks),
+      );
+    } on Failure catch (err) {
+      // Reverse optimistic update
+      _tasks = cachedTasks;
+      unawaited(
+        _taskDatabase.cacheTasks(_tasks),
+      );
       NotificationUtil.showNotification(
         err.message,
         NotificationType.error,

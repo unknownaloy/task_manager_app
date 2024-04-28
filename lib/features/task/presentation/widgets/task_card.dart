@@ -33,22 +33,25 @@ class TaskCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  height: 24,
-                  width: 24,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(8),
+                GestureDetector(
+                  onTap: onEdit,
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 24,
+                    width: 24,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(8),
+                      ),
+                      border: Border.all(),
                     ),
-                    border: Border.all(),
+                    child: task.completed
+                        ? const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
-                  child: task.completed
-                      ? const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                        )
-                      : null,
                 ),
                 IconButton(
                   onPressed: onDelete,

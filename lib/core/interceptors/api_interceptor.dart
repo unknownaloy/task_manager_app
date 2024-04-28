@@ -8,9 +8,8 @@ class ApiInterceptor implements InterceptorContract {
   Future<BaseRequest> interceptRequest({
     required BaseRequest request,
   }) async {
-
-    if (request.method.toUpperCase() == "POST") {
-      debugPrint("IS POST REQUEST");
+    if (request.method.toUpperCase() == "POST" ||
+        request.method.toUpperCase() == "PUT") {
       request.headers["Content-type"] = "application/json";
     }
 
@@ -22,8 +21,6 @@ class ApiInterceptor implements InterceptorContract {
       // Create a new request with the updated URL
       final updatedRequest = request.copyWith(url: updatedUrl);
 
-      debugPrint("updatedRequest - ${updatedRequest.url}");
-
       return updatedRequest;
     }
     return request;
@@ -33,17 +30,16 @@ class ApiInterceptor implements InterceptorContract {
   Future<BaseResponse> interceptResponse({
     required BaseResponse response,
   }) async {
-
     debugPrint("ApiInterceptor ------------START----------->");
-    debugPrint("\nApiInterceptor - METHOD -- ${response.request?.method.toUpperCase()}");
+    debugPrint(
+      "\nApiInterceptor - METHOD -- ${response.request?.method.toUpperCase()}",
+    );
     debugPrint("\nApiInterceptor - URL -- ${response.request?.url}");
     debugPrint("\nApiInterceptor - STATUS_CODE -- ${response.statusCode}");
     if (response is Response) {
       debugPrint("\nApiInterceptor - RESPONSE -- ${response.body}");
-
     }
     debugPrint("ApiInterceptor ------------END----------->");
-
 
     return response;
   }
