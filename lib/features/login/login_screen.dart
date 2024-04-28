@@ -4,6 +4,7 @@ import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
 import 'package:task_manager_app/features/login/authentication_view_model.dart';
+import 'package:task_manager_app/features/login/data/login_dto.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -126,10 +127,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              model.handleLogin(
+                              final params = LoginDto(
                                 username: _usernameTextController.text.trim(),
                                 password: _passwordTextController.text.trim(),
                               );
+                              model.handleLogin(params);
                             }
                           },
                           style: ButtonStyle(

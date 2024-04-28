@@ -37,18 +37,11 @@ class AuthenticationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> handleLogin({
-    required String username,
-    required String password,
-  }) async {
+  Future<void> handleLogin(LoginDto params) async {
     _loginState = const RequestState.loading();
     notifyListeners();
 
     try {
-      final params = LoginDto(
-        username: username,
-        password: password,
-      );
       final newUser = await _loginRepository.login(params);
       _user = newUser;
       await _userDataSource.cacheUser(newUser);
