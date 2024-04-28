@@ -30,7 +30,7 @@ class TaskViewModel extends ChangeNotifier {
     _requestState = const RequestState.loading();
 
     try {
-      // final params = TaskDto(skip: currentIndex);
+      _taskDto = _taskDto.copyWith(skip: 0);
       _tasks = await _taskRepository.getUserTasks(_taskDto);
 
       _requestState = const RequestState.success();

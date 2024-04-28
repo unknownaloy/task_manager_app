@@ -9,12 +9,12 @@ part of 'task.dart';
 _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
       id: (json['id'] as num).toInt(),
       todo: json['todo'] as String,
-      completed: json['completed'] as bool,
+      completed: const TaskCompletedConverter().fromJson(json['completed']),
     );
 
 Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'todo': instance.todo,
-      'completed': instance.completed,
+      'completed': const TaskCompletedConverter().toJson(instance.completed),
     };

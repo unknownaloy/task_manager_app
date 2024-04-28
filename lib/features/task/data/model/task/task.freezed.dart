@@ -22,6 +22,7 @@ Task _$TaskFromJson(Map<String, dynamic> json) {
 mixin _$Task {
   int get id => throw _privateConstructorUsedError;
   String get todo => throw _privateConstructorUsedError;
+  @TaskCompletedConverter()
   bool get completed => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -34,7 +35,7 @@ abstract class $TaskCopyWith<$Res> {
   factory $TaskCopyWith(Task value, $Res Function(Task) then) =
       _$TaskCopyWithImpl<$Res, Task>;
   @useResult
-  $Res call({int id, String todo, bool completed});
+  $Res call({int id, String todo, @TaskCompletedConverter() bool completed});
 }
 
 /// @nodoc
@@ -78,7 +79,7 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
       __$$TaskImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String todo, bool completed});
+  $Res call({int id, String todo, @TaskCompletedConverter() bool completed});
 }
 
 /// @nodoc
@@ -115,7 +116,10 @@ class __$$TaskImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TaskImpl implements _Task {
-  _$TaskImpl({required this.id, required this.todo, required this.completed});
+  _$TaskImpl(
+      {required this.id,
+      required this.todo,
+      @TaskCompletedConverter() required this.completed});
 
   factory _$TaskImpl.fromJson(Map<String, dynamic> json) =>
       _$$TaskImplFromJson(json);
@@ -125,6 +129,7 @@ class _$TaskImpl implements _Task {
   @override
   final String todo;
   @override
+  @TaskCompletedConverter()
   final bool completed;
 
   @override
@@ -165,7 +170,7 @@ abstract class _Task implements Task {
   factory _Task(
       {required final int id,
       required final String todo,
-      required final bool completed}) = _$TaskImpl;
+      @TaskCompletedConverter() required final bool completed}) = _$TaskImpl;
 
   factory _Task.fromJson(Map<String, dynamic> json) = _$TaskImpl.fromJson;
 
@@ -174,6 +179,7 @@ abstract class _Task implements Task {
   @override
   String get todo;
   @override
+  @TaskCompletedConverter()
   bool get completed;
   @override
   @JsonKey(ignore: true)
