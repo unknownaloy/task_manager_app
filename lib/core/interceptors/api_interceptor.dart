@@ -8,10 +8,6 @@ class ApiInterceptor implements InterceptorContract {
   Future<BaseRequest> interceptRequest({
     required BaseRequest request,
   }) async {
-    if (request.method.toUpperCase() == "POST" ||
-        request.method.toUpperCase() == "PUT") {
-      request.headers["Content-type"] = "application/json";
-    }
 
     // Check if the request URL already contains the base URL
     if (!request.url.toString().startsWith(baseUrl)) {

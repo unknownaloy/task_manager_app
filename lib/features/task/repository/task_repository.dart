@@ -63,10 +63,10 @@ class TaskRepository {
     try {
       final url = Uri.parse("/todos/add");
 
-      final response = await _network.client.post(
-        url,
-        body: params.toJson(),
-      );
+      final response =
+          await _network.client.post(url, body: params.toJson(), headers: {
+        "Content-Type": "application/json",
+      });
 
       final json = jsonDecode(response.body) as JSON;
 
@@ -95,10 +95,10 @@ class TaskRepository {
     try {
       final url = Uri.parse("/todos/${params.id}");
 
-      final response = await _network.client.put(
-        url,
-        body: params.toJson(),
-      );
+      final response =
+          await _network.client.put(url, body: params.toJson(), headers: {
+        "Content-Type": "application/json",
+      });
 
       final json = jsonDecode(response.body) as JSON;
 
