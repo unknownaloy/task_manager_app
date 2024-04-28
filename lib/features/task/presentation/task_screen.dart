@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
-import 'package:task_manager_app/features/login/authentication_view_model.dart';
+import 'package:task_manager_app/features/task/data/dto/task_dto.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
+import 'package:task_manager_app/features/task/presentation/widgets/task_app_bar.dart';
 import 'package:task_manager_app/features/task/presentation/widgets/task_card.dart';
 import 'package:task_manager_app/features/task/presentation/widgets/task_dialog.dart';
 
@@ -35,7 +35,8 @@ class _TaskScreenState extends State<TaskScreen> {
 
     if (maxScroll - currentScroll <= delta) {
       if (_hasInternetConnection) {
-        context.read<TaskViewModel>().fetchMoreTasks();
+        final params = context.read<TaskViewModel>().taskDto;
+        context.read<TaskViewModel>().fetchMoreTasks(params);
       }
     }
 
@@ -68,7 +69,8 @@ class _TaskScreenState extends State<TaskScreen> {
           );
         }
         if (_isLoadedFromCache || taskViewModel.tasks.isEmpty) {
-          taskViewModel.fetchInitialTasks();
+          const params = TaskDto(skip: 0);
+          taskViewModel.fetchInitialTasks(params);
         }
       } else {
         if (taskViewModel.tasks.isEmpty) {
@@ -104,9 +106,6 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authViewModel = context.read<AuthenticationViewModel>();
-    final user = authViewModel.user!;
-
     return Consumer<TaskViewModel>(
       builder: (_, model, __) {
         return model.requestState.maybeWhen(
@@ -121,8 +120,21 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
           ),
           error: (message) => Scaffold(
-            body: Center(
-              child: Text(message),
+            appBar: const TaskAppBar(),
+            body: RefreshIndicator(
+              onRefresh: () {
+                const params = TaskDto(skip: 0);
+                return model.fetchInitialTasks(params);
+              },
+              child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text(message),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           success: () {
@@ -135,113 +147,82 @@ class _TaskScreenState extends State<TaskScreen> {
             });
 
             return Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                title: Text(
-                  "Hey ${user.firstName} ${user.lastName} 👋🏼",
-                  style: const TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                actions: [
-                  CircleAvatar(
-                    radius: 23,
-                    child: ClipRRect(
-                      clipBehavior: Clip.hardEdge,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(23),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: user.image,
-                        placeholder: (context, url) => Container(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  IconButton(
-                    onPressed: authViewModel.handleSignOut,
-                    icon: const Icon(
-                      Icons.logout,
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                ],
-              ),
+              appBar: const TaskAppBar(),
               body: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      const SliverToBoxAdapter(
-                        child: Text(
-                          "Tasks",
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      if (model.tasks.isEmpty)
-                        const SliverFillRemaining(
-                          child: Center(
-                            child: Icon(
-                              Icons.folder_delete_rounded,
-                              size: 128,
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                      const params = TaskDto(skip: 0);
+                      return model.fetchInitialTasks(params);
+                    },
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        const SliverToBoxAdapter(
+                          child: Text(
+                            "Tasks",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        )
-                      else
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              final task = model.tasks[index];
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TaskCard(
-                                    task: task,
-                                    onEdit: () => model.editTask(task),
-                                    onDelete: () =>
-                                        model.deleteTaskHandler(task),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              );
-                            },
-                            childCount: model.tasks.length,
-                          ),
                         ),
-                      SliverToBoxAdapter(
-                        child: _isAtBottom && _isLoadingMoreData
-                            ? Center(
-                                child: Container(
-                                  margin: const EdgeInsets.only(
-                                    bottom: 4,
+                        if (model.tasks.isEmpty)
+                          const SliverFillRemaining(
+                            child: Center(
+                              child: Icon(
+                                Icons.folder_delete_rounded,
+                                size: 128,
+                              ),
+                            ),
+                          )
+                        else
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                final task = model.tasks[index];
+                                return Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TaskCard(
+                                      task: task,
+                                      onEdit: () => model.editTask(task),
+                                      onDelete: () =>
+                                          model.deleteTaskHandler(task),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                );
+                              },
+                              childCount: model.tasks.length,
+                            ),
+                          ),
+                        SliverToBoxAdapter(
+                          child: _isAtBottom && _isLoadingMoreData
+                              ? Center(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                      bottom: 4,
+                                    ),
+                                    width: 18,
+                                    height: 18,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
-                                  width: 18,
-                                  height: 18,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

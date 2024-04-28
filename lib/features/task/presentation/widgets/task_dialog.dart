@@ -93,7 +93,7 @@ class _TaskDialogState extends State<TaskDialog> {
                     userId: user.id,
                   );
 
-                  model.addNewTask(params);
+                  model.      addNewTask(params);
                 }
               },
               style: ButtonStyle(

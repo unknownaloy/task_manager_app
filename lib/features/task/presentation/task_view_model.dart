@@ -30,6 +30,8 @@ class TaskViewModel extends ChangeNotifier {
   bool get isFetchingMoreData => _isFetchingMoreData;
 
   var _taskDto = const TaskDto(skip: 0);
+  TaskDto get taskDto => _taskDto;
+
 
   RequestState _requestState = const RequestState.idle();
   RequestState get requestState => _requestState;
@@ -37,18 +39,20 @@ class TaskViewModel extends ChangeNotifier {
   RequestState _addRequestState = const RequestState.idle();
   RequestState get addRequestState => _addRequestState;
 
-  Future<void> fetchInitialTasks() async {
+  Future<void> fetchInitialTasks(TaskDto params) async {
     _requestState = const RequestState.loading();
 
     try {
       _taskDto = _taskDto.copyWith(skip: 0);
-      _tasks = await _taskRepository.getUserTasks(_taskDto);
+      _tasks = await _taskRepository.getUserTasks(params);
 
       _requestState = const RequestState.success();
 
       if (_tasks.isNotEmpty) {
         await _taskDatabase.cacheTasks(tasks);
       }
+
+      _taskDto = _taskDto.copyWith(skip: _taskDto.skip + 10);
     } on Failure catch (err) {
       _requestState = RequestState.error(message: err.message);
     } finally {
@@ -70,16 +74,16 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchMoreTasks() async {
+    Future<void> fetchMoreTasks(TaskDto params) async {
     try {
       if (_hasReachedMax || _isFetchingMoreData) return;
 
       _isFetchingMoreData = true;
       notifyListeners();
 
-      _taskDto = _taskDto.copyWith(skip: _taskDto.skip + 10);
+      final newTasks = await _taskRepository.getUserTasks(params);
 
-      final newTasks = await _taskRepository.getUserTasks(_taskDto);
+      _taskDto = _taskDto.copyWith(skip: _taskDto.skip + 10);
 
       if (newTasks.length < _taskDto.limit || newTasks.isEmpty) {
         _hasReachedMax = true;
@@ -97,9 +101,9 @@ class TaskViewModel extends ChangeNotifier {
       notifyListeners();
 
       if (_tasks.isNotEmpty) {
-        unawaited(
-          _taskDatabase.cacheTasks(newTasks),
-        );
+        // unawaited(
+          await _taskDatabase.cacheTasks(_tasks);
+        // );
       }
     } on Failure catch (err) {
       _taskDto = _taskDto.copyWith(skip: _taskDto.skip - 10);
