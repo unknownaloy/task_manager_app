@@ -4,7 +4,7 @@ This is a user-friendly task manager app with data caching
 
 ## Download for Android
 
-- [👉🏼 Download and Install the App](https://github.com/unknownaloy/task_manager_app/raw/main/apk/task_manager_ellis.apk)
+- [👉🏼 Download and Install the App](https://github.com/unknownaloy/task_manager_app/raw/master/apk/task_manager_ellis.apk)
 
 ## Prerequisites
 
