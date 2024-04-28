@@ -13,13 +13,44 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  int _currentIndex = 0;
+  late final ScrollController _scrollController;
+
+  bool _isAtBottom = false;
+  bool _isLoadingMoreData = false;
+
+  void _scrollListenerHandler() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final delta = MediaQuery.of(context).size.height * 0.20;
+
+    if (maxScroll - currentScroll <= delta) {
+      context.read<TaskViewModel>().fetchMoreTasks();
+    }
+
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      setState(() => _isAtBottom = true);
+    } else {
+      setState(() => _isAtBottom = false);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    context.read<TaskViewModel>().fetchTasks(_currentIndex);
+    context.read<TaskViewModel>().fetchInitialTasks();
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListenerHandler);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -44,6 +75,14 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
           ),
           success: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (model.isFetchingMoreData) {
+                setState(() => _isLoadingMoreData = true);
+              } else {
+                setState(() => _isLoadingMoreData = false);
+              }
+            });
+
             return Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -76,6 +115,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     vertical: 16,
                   ),
                   child: CustomScrollView(
+                    controller: _scrollController,
                     slivers: [
                       const SliverToBoxAdapter(
                         child: Text(
@@ -128,6 +168,22 @@ class _TaskScreenState extends State<TaskScreen> {
                             childCount: model.tasks.length,
                           ),
                         ),
+                      SliverToBoxAdapter(
+                        child: _isAtBottom && _isLoadingMoreData
+                            ? Center(
+                                child: Container(
+                                  margin: const EdgeInsets.only(
+                                    bottom: 4,
+                                  ),
+                                  width: 18,
+                                  height: 18,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                     ],
                   ),
                 ),
