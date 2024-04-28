@@ -9,8 +9,10 @@ class ApiInterceptor implements InterceptorContract {
     required BaseRequest request,
   }) async {
 
-    // request.headers["Content-type"] = "application/json";
-    // request.headers["Accept"] = "application/json";
+    if (request.method.toUpperCase() == "POST") {
+      debugPrint("IS POST REQUEST");
+      request.headers["Content-type"] = "application/json";
+    }
 
     // Check if the request URL already contains the base URL
     if (!request.url.toString().startsWith(baseUrl)) {
@@ -19,6 +21,8 @@ class ApiInterceptor implements InterceptorContract {
 
       // Create a new request with the updated URL
       final updatedRequest = request.copyWith(url: updatedUrl);
+
+      debugPrint("updatedRequest - ${updatedRequest.url}");
 
       return updatedRequest;
     }

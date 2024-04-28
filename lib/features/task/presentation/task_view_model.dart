@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:task_manager_app/core/data/data_source/local/task_database.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
 import 'package:task_manager_app/core/data/unions/request_state.dart';
 import 'package:task_manager_app/core/utils/failure.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
+import 'package:task_manager_app/features/task/data/dto/add_task.dto.dart';
 import 'package:task_manager_app/features/task/data/dto/task_dto.dart';
 import 'package:task_manager_app/features/task/data/model/task/task.dart';
 import 'package:task_manager_app/features/task/repository/task_repository.dart';
@@ -21,7 +21,6 @@ class TaskViewModel extends ChangeNotifier {
   final TaskRepository _taskRepository;
   final TaskDatabase _taskDatabase;
 
-
   var _tasks = <Task>[];
   List<Task> get tasks => [..._tasks];
 
@@ -33,6 +32,12 @@ class TaskViewModel extends ChangeNotifier {
 
   RequestState _requestState = const RequestState.idle();
   RequestState get requestState => _requestState;
+
+  RequestState _addRequestState = const RequestState.idle();
+  RequestState get addRequestState => _addRequestState;
+
+  RequestState _editRequestState = const RequestState.idle();
+  RequestState get editRequestState => _editRequestState;
 
   Future<void> fetchInitialTasks() async {
     _requestState = const RequestState.loading();
@@ -47,13 +52,11 @@ class TaskViewModel extends ChangeNotifier {
         await _taskDatabase.cacheTasks(tasks);
       }
     } on Failure catch (err) {
-      // Handle error
       _requestState = RequestState.error(message: err.message);
     } finally {
       notifyListeners();
     }
   }
-
 
   Future<void> loadFromCache() async {
     _requestState = const RequestState.loading();
@@ -62,16 +65,12 @@ class TaskViewModel extends ChangeNotifier {
       _tasks = await _taskDatabase.getAllTasks();
 
       _requestState = const RequestState.success();
-
     } on Failure catch (err) {
-      // Handle error
       _requestState = RequestState.error(message: err.message);
     } finally {
       notifyListeners();
     }
   }
-
-
 
   Future<void> fetchMoreTasks() async {
     try {
@@ -94,10 +93,16 @@ class TaskViewModel extends ChangeNotifier {
       }
 
       final updatedTasks = [..._tasks, ...newTasks];
-
       _tasks = updatedTasks;
+
       _isFetchingMoreData = false;
       notifyListeners();
+
+      if (_tasks.isNotEmpty) {
+        unawaited(
+          _taskDatabase.cacheTasks(newTasks),
+        );
+      }
     } on Failure catch (err) {
       _taskDto = _taskDto.copyWith(skip: _taskDto.skip - 10);
       NotificationUtil.showNotification(
@@ -107,5 +112,31 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> addNewTask(AddTaskDto params) async {
+    _addRequestState = const RequestState.loading();
 
+    notifyListeners();
+
+    try {
+      final task = await _taskRepository.addTask(params);
+
+      final updatedTasks = [task, ..._tasks];
+
+      _tasks = updatedTasks;
+
+      _addRequestState = const RequestState.success();
+
+      unawaited(
+        _taskDatabase.cacheTasks(updatedTasks),
+      );
+    } on Failure catch (err) {
+      _addRequestState = RequestState.error(message: err.message);
+      NotificationUtil.showNotification(
+        err.message,
+        NotificationType.error,
+      );
+    } finally {
+      notifyListeners();
+    }
+  }
 }

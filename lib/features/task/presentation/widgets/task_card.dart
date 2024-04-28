@@ -16,6 +16,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: task.completed ? Colors.green.withOpacity(.8) : null,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 0, 16),
         child: Row(
@@ -32,9 +33,22 @@ class TaskCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit),
+                Container(
+                  alignment: Alignment.center,
+                  height: 24,
+                  width: 24,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(8),
+                    ),
+                    border: Border.all(),
+                  ),
+                  child: task.completed
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                        )
+                      : null,
                 ),
                 IconButton(
                   onPressed: onDelete,

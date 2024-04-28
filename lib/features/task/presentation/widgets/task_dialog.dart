@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/features/task/data/model/task/task.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/core/data/unions/request_state.dart';
+import 'package:task_manager_app/features/login/login_view_model.dart';
+import 'package:task_manager_app/features/task/data/dto/add_task.dto.dart';
+import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
 
 class TaskDialog extends StatefulWidget {
   const TaskDialog({
-    required this.title,
-    this.task,
     super.key,
   });
-
-  final String title;
-  final Task? task;
 
   @override
   State<TaskDialog> createState() => _TaskDialogState();
@@ -23,7 +22,7 @@ class _TaskDialogState extends State<TaskDialog> {
   void initState() {
     super.initState();
 
-    _taskController = TextEditingController(text: widget.task?.todo ?? "");
+    _taskController = TextEditingController();
   }
 
   @override
@@ -35,6 +34,15 @@ class _TaskDialogState extends State<TaskDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final model = context.watch<TaskViewModel>();
+    final user = context.read<LoginViewModel>().user!;
+
+    if (model.addRequestState == const RequestState.success()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
+    }
+    
     return Form(
       key: _formKey,
       child: Padding(
@@ -43,9 +51,9 @@ class _TaskDialogState extends State<TaskDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              widget.title,
-              style: const TextStyle(
+            const Text(
+              "Add Task",
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -80,10 +88,12 @@ class _TaskDialogState extends State<TaskDialog> {
             TextButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // model.handleLogin(
-                  //   username: _usernameTextController.text.trim(),
-                  //   password: _passwordTextController.text.trim(),
-                  // );
+                  final params = AddTaskDto(
+                    todo: _taskController.text.trim(),
+                    userId: user.id,
+                  );
+
+                  model.addNewTask(params);
                 }
               },
               style: ButtonStyle(
@@ -99,14 +109,14 @@ class _TaskDialogState extends State<TaskDialog> {
                   ),
                 ),
               ),
-              child: 1 + 1 == 3
+              child: model.addRequestState == const RequestState.loading()
                   ? const CircularProgressIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
                     )
-                  : Text(
-                      widget.title,
-                      style: const TextStyle(
+                  : const Text(
+                      "Add Task",
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 18,

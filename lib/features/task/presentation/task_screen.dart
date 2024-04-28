@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/core/data/enums/notification_type.dart';
+import 'package:task_manager_app/core/data/unions/request_state.dart';
 import 'package:task_manager_app/core/utils/notification_util.dart';
 import 'package:task_manager_app/features/login/login_view_model.dart';
 import 'package:task_manager_app/features/task/presentation/task_view_model.dart';
@@ -28,7 +29,6 @@ class _TaskScreenState extends State<TaskScreen> {
   bool _hasInternetConnection = true;
   bool _isLoadedFromCache = false;
 
-
   void _scrollListenerHandler() {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
@@ -49,7 +49,6 @@ class _TaskScreenState extends State<TaskScreen> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -63,9 +62,12 @@ class _TaskScreenState extends State<TaskScreen> {
 
       setState(() => _hasInternetConnection = hasConnection);
 
-      debugPrint("_hasInternetConnection - $_hasInternetConnection");
-
       if (hasConnection) {
+        if (_isLoadedFromCache) {
+          NotificationUtil.showNotification(
+            "Tasks updated",
+          );
+        }
         if (_isLoadedFromCache || taskViewModel.tasks.isEmpty) {
           taskViewModel.fetchInitialTasks();
         }
@@ -80,6 +82,11 @@ class _TaskScreenState extends State<TaskScreen> {
           setState(() {
             _isLoadedFromCache = true;
           });
+        } else {
+          NotificationUtil.showNotification(
+            "Internet connection lost",
+            NotificationType.caution,
+          );
         }
       }
     });
@@ -196,15 +203,14 @@ class _TaskScreenState extends State<TaskScreen> {
                                   TaskCard(
                                     task: task,
                                     onEdit: () {
-                                      showDialog<void>(
-                                        context: context,
-                                        builder: (context) => Dialog(
-                                          child: TaskDialog(
-                                            title: "Edit Task",
-                                            task: task,
-                                          ),
-                                        ),
-                                      );
+                                      // showDialog<void>(
+                                      //   context: context,
+                                      //   builder: (context) => Dialog(
+                                      //     child: TaskDialog(
+                                      //       task: task,
+                                      //     ),
+                                      //   ),
+                                      // );
                                     },
                                     onDelete: () {},
                                   ),
@@ -241,10 +247,9 @@ class _TaskScreenState extends State<TaskScreen> {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
+                    barrierDismissible: false,
                     builder: (context) => const Dialog(
-                      child: TaskDialog(
-                        title: "Add Task",
-                      ),
+                      child: TaskDialog(),
                     ),
                   );
                 },
